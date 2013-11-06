@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="QuartzService" default="build" basedir=".">
+  <property file="local.properties" />
+  <property file="default.properties" />
+
+  <property name="src.dir" value="src" />
+  <property name="lib.dir" value="lib" />
+  <property name="war.dir" value="war" />
+  <property name="webinf.dir" value="${war.dir}/WEB-INF" />
+
+  <property name="war.file" value="${war.dir}/${ant.project.name}.war" />
+
+  <path id="project.class.path">
+    <pathelement location="${webinf.dir}/classes" />
+
+    <fileset dir="${webinf.dir}/lib" includes="**/*.jar" />
+    <fileset dir="${lib.dir}" includes="**/*.jar" />
+  </path>
+
+  <taskdef name="groovyc" classname="org.codehaus.groovy.ant.Groovyc" classpathref="project.class.path" />
+
+  <!-- ============================================================================== -->
+  <!-- Target: init                                                                   -->
+  <!-- ============================================================================== -->
+  <target name="init" description="Initializes the build">
+    <echo>Initializing build directory</echo>
+
+    <delete>
+      <fileset dir="${webinf.dir}/classes" />
+    </delete>
+
+   <!-- To initialize quartz properties bundled with war: <copy file="${webinf.dir}/lib/padawan_quartz.properties" todir="${webinf.dir}/classes" /> -->
+  	
+  </target>
+
+  <!-- ============================================================================== -->
+  <!-- Target: compile                                                                -->
+  <!-- ============================================================================== -->
+  <target name="compile" depends="init" description="Compiles the groovy classes">
+    <echo>Compiling groovy classes</echo>
+
+    <groovyc srcdir="${src.dir}" destdir="${webinf.dir}/classes">
+      <classpath>
+
+        <path refid="project.class.path" />
+      </classpath>
+
+      <javac source="1.6" target="1.6" debug="on" />
+    </groovyc>
+  </target>
+
+  <!-- ============================================================================== -->
+  <!-- Target: war                                                                    -->
+  <!-- ============================================================================== -->
+  <target name="war" description="Generate the service WAR file">
+    <echo>Generating service WAR file</echo>
+
+    <delete file="${war.file}" />
+
+    <jar destfile="${war.file}" basedir="${war.dir}" />
+  </target>
+
+  <!-- ============================================================================== -->
+  <!-- Target: build                                                                  -->
+  <!-- ============================================================================== -->
+  <target name="build" depends="compile, war" description="Build the service" />
+</project>
